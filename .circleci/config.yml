@@ -38,7 +38,10 @@ jobs:
             pip install -r requirements.txt
             pip install black
       - run:
-          name: Check code formatting with Black
+          name: Format code with Black
+          command: black .
+      - run:
+          name: Check code formatting
           command: black --check --diff .
 
 workflows:
