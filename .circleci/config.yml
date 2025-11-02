@@ -1,0 +1,49 @@
+version: 2.1
+
+jobs:
+  test:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            - v1-dependencies-
+      - run:
+          name: Install dependencies
+          command: |
+            pip install -r requirements.txt
+            pip install black
+      - save_cache:
+          paths:
+            - ~/.cache/pip
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+      - run:
+          name: Run tests
+          command: pytest
+
+  lint:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            - v1-dependencies-
+      - run:
+          name: Install dependencies
+          command: |
+            pip install -r requirements.txt
+            pip install black
+      - run:
+          name: Check code formatting with Black
+          command: black --check --diff .
+
+workflows:
+  version: 2
+  quality-check:
+    jobs:
+      - test
+      - lint
